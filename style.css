@@ -143,3 +143,9 @@ h1 span { color: #4d9b78; }
 .read-aloud-button { margin-top: 12px; padding: 6px 10px; border: 1px solid #dce8e1; border-radius: 7px; color: #47785f; background: #f8fbf9; font-size: 10px; }
 .read-aloud-button:hover { background: #edf5f0; }
 .read-aloud-button.speaking { color: #fff; background: #315d4a; border-color: #315d4a; }
+
+
+/* Speech speed controls */
+.speech-controls { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-top:12px; }
+.speech-controls .read-aloud-button { margin-top:0; }
+.speech-rate { min-height:36px; padding:7px 10px; border:1px solid #dce8e1; border-radius:8px; color:#47785f; background:#fff; font-size:12px; cursor:pointer; }
