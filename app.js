@@ -7,6 +7,7 @@
   const suggestions = document.querySelectorAll('.suggestion-card');
   let activeSpeechButton = null;
   let speechToken = 0;
+  let conversationHistory = [];
 
   const resetSpeechButton = () => {
     if (activeSpeechButton) {
@@ -159,19 +160,75 @@
     item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
 
-  const sendMessage = () => {
-    const question = textarea.value.trim();
-    if (!question) return;
+  
+const sendMessage = async () => {
+  const question = textarea.value.trim();
+  if (!question) return;
 
-    addMessage('user', question);
-    textarea.value = '';
-    updateSendButton();
+  addMessage('user', question);
+  textarea.value = '';
+  updateSendButton();
 
-    addMessage(
-      'assistant',
-      'メッセージを受け取りました。現在は画面動作確認用の仮返信です。次の段階でGAS・Gemini分析機能に接続します。'
+  sendButton.disabled = true;
+
+  const loadingMessage = 'FlowShift AI Analystが分析しています…';
+  addMessage('assistant', loadingMessage);
+
+  const loadingItem = messageList.lastElementChild;
+
+  try {
+    const response = await fetch(
+      'https://flowshift-investor-api.kengo-s-ot.workers.dev/',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=UTF-8'
+        },
+        body: JSON.stringify({
+          question: question,
+          history: conversationHistory
+        })
+      }
     );
-  };
+
+    const result = await response.json();
+
+    if (!response.ok || result.success === false) {
+      throw new Error(result.error || '通信に失敗しました');
+    }
+
+    const answer =
+      result.answer ||
+      result.response ||
+      result.text ||
+      result.message;
+
+    if (!answer) {
+      throw new Error('AIの回答データが見つかりません');
+    }
+
+    loadingItem.remove();
+
+    addMessage('assistant', answer);
+
+    conversationHistory.push(
+      { role: 'user', text: question },
+      { role: 'model', text: answer }
+    );
+
+    conversationHistory = conversationHistory.slice(-12);
+
+  } catch (error) {
+    loadingItem.querySelector('.message-body').textContent =
+      '接続エラー: ' + error.message;
+
+    console.error('FlowShift API error:', error);
+
+  } finally {
+    updateSendButton();
+  }
+};
+
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -206,6 +263,7 @@
   newChatButton?.addEventListener('click', () => {
     stopReading();
     messageList.replaceChildren();
+    conversationHistory = [];
     textarea.value = '';
     updateSendButton();
     textarea.focus();
