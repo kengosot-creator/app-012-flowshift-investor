@@ -73,7 +73,9 @@
       const readButton = document.createElement('button');
       readButton.type = 'button';
       readButton.className = 'read-aloud-button';
-      readButton.textContent = '▶ 読み上げ';
+      readButton.textContent = '🔊 読み上げ';
+      readButton.setAttribute('aria-label', 'このAI回答を音声で読み上げる');
+      readButton.style.cssText = 'display:inline-flex!important;align-items:center;gap:6px;margin-top:14px;padding:9px 14px;border:1px solid #b9d7c6;border-radius:8px;color:#315d4a;background:#f0f7f2;font-size:12px;font-weight:600;cursor:pointer;visibility:visible;opacity:1;';
       readButton.addEventListener('click', () => speakText(text, readButton));
       item.appendChild(readButton);
     }
