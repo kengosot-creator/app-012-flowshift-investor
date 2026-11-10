@@ -130,11 +130,28 @@
         rateSelect.appendChild(option);
       });
       readButton.addEventListener('click', () => speakText(text, readButton, rateSelect));
+      const testButton = document.createElement('button');
+      testButton.type = 'button';
+      testButton.textContent = '短い音声テスト';
+      testButton.style.cssText = 'margin:8px 0 0 8px;padding:8px 10px;border:1px solid #ccd8d0;border-radius:8px;background:#fff;color:#315d4a;font-size:12px;';
+      testButton.addEventListener('click', () => {
+        if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+          status.textContent = 'このブラウザは音声合成に対応していません。';
+          return;
+        }
+        const testUtterance = new SpeechSynthesisUtterance('こんにちは。音声テストです。');
+        testUtterance.lang = 'ja-JP';
+        testUtterance.onstart = () => { status.textContent = '短い音声テストを再生中です。'; };
+        testUtterance.onend = () => { status.textContent = '短い音声テストは正常終了しました。'; };
+        testUtterance.onerror = (event) => { status.textContent = '短い音声テストも失敗: ' + (event.error || '不明'); };
+        window.speechSynthesis.resume();
+        window.speechSynthesis.speak(testUtterance);
+      });
       const status = document.createElement('span');
       status.className = 'speech-status';
       status.setAttribute('role', 'status');
       status.style.cssText = 'font-size:11px;color:#9a6254;';
-      controls.append(readButton, rateSelect, status);
+      controls.append(readButton, rateSelect, testButton, status);
       item.appendChild(controls);
     }
 
