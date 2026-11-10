@@ -28,7 +28,10 @@
       stopReading();
       return;
     }
-    stopReading();
+    // Android Chromeでは、再生開始直前のcancel()が新しい音声まで止める場合がある。
+    // 既に別の読み上げが動いている場合だけ停止する。
+    if (activeSpeechButton) stopReading();
+    speechToken++;
     const token = speechToken;
     const rate = Number(rateSelect.value) || 1;
     const voices = window.speechSynthesis.getVoices();
@@ -46,7 +49,13 @@
       utterance.rate = rate;
       if (japaneseVoice) utterance.voice = japaneseVoice;
       utterance.onend = () => speakChunk(index + 1);
-      utterance.onerror = () => { if (token === speechToken) stopReading(); };
+      utterance.onerror = (event) => {
+        if (token !== speechToken) return;
+        stopReading();
+        const status = button.parentElement?.querySelector('.speech-status');
+        if (status) status.textContent = '音声を再生できません。Androidのテキスト読み上げ設定を確認してください。';
+        console.warn('Speech synthesis error:', event.error);
+      };
       window.speechSynthesis.speak(utterance);
     };
     activeSpeechButton = button;
@@ -102,7 +111,11 @@
         rateSelect.appendChild(option);
       });
       readButton.addEventListener('click', () => speakText(text, readButton, rateSelect));
-      controls.append(readButton, rateSelect);
+      const status = document.createElement('span');
+      status.className = 'speech-status';
+      status.setAttribute('role', 'status');
+      status.style.cssText = 'font-size:11px;color:#9a6254;';
+      controls.append(readButton, rateSelect, status);
       item.appendChild(controls);
     }
 
