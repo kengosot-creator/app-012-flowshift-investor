@@ -5,6 +5,42 @@
   const conversation = document.querySelector('.conversation');
   const newChatButton = document.querySelector('.new-chat');
   const suggestions = document.querySelectorAll('.suggestion-card');
+  let activeSpeechButton = null;
+
+  const stopReading = () => {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (activeSpeechButton) {
+      activeSpeechButton.textContent = '▶ 読み上げ';
+      activeSpeechButton.classList.remove('speaking');
+      activeSpeechButton = null;
+    }
+  };
+
+  const speakText = (text, button) => {
+    if (!('speechSynthesis' in window)) {
+      button.textContent = '音声非対応';
+      button.disabled = true;
+      return;
+    }
+    if (activeSpeechButton === button) {
+      stopReading();
+      return;
+    }
+    stopReading();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ja-JP';
+    utterance.rate = 1;
+    const voices = window.speechSynthesis.getVoices();
+    const japaneseVoice = voices.find(voice => voice.lang === 'ja-JP') ||
+      voices.find(voice => voice.lang?.startsWith('ja'));
+    if (japaneseVoice) utterance.voice = japaneseVoice;
+    utterance.onend = stopReading;
+    utterance.onerror = stopReading;
+    activeSpeechButton = button;
+    button.textContent = '■ 停止';
+    button.classList.add('speaking');
+    window.speechSynthesis.speak(utterance);
+  };
 
   if (!form || !textarea || !sendButton || !conversation) return;
 
@@ -32,6 +68,16 @@
     body.textContent = text;
 
     item.append(label, body);
+
+    if (role === 'assistant') {
+      const readButton = document.createElement('button');
+      readButton.type = 'button';
+      readButton.className = 'read-aloud-button';
+      readButton.textContent = '▶ 読み上げ';
+      readButton.addEventListener('click', () => speakText(text, readButton));
+      item.appendChild(readButton);
+    }
+
     messageList.appendChild(item);
     item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
@@ -81,6 +127,7 @@
   });
 
   newChatButton?.addEventListener('click', () => {
+    stopReading();
     messageList.replaceChildren();
     textarea.value = '';
     updateSendButton();
