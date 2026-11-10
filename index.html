@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142a35">
+  <meta name="description" content="資金の流れを読み、投資の判断を支える。FlowShift Investor">
+  <title>FlowShift Investor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="メインメニュー">
+      <a class="brand" href="#" aria-label="FlowShift Investor ホーム">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M5 22.5 12 15l5 4 10-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 8H27v6.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="brand-copy"><strong>FlowShift</strong><small>INVESTOR</small></span>
+      </a>
+
+      <button class="new-chat" type="button">
+        <span class="plus-icon" aria-hidden="true">＋</span>
+        <span>新しいチャット</span>
+      </button>
+
+      <div class="sidebar-section">
+        <p class="section-label">WORKSPACE</p>
+        <a class="nav-item active" href="#"><span class="nav-icon">◉</span> AI Analyst</a>
+        <a class="nav-item" href="#"><span class="nav-icon">▤</span> 市場分析データ</a>
+        <a class="nav-item" href="#"><span class="nav-icon">⌁</span> 投資方針・ルール</a>
+      </div>
+
+      <div class="sidebar-section history-section">
+        <p class="section-label">最近の会話</p>
+        <a class="history-item current" href="#">11/10 INITIAL_FLOWの候補</a>
+        <a class="history-item" href="#">テーマ別の動向を確認</a>
+        <a class="history-item" href="#">RE_ACCELERATIONの条件</a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="connection"><span class="status-dot"></span><span>分析環境</span><strong>準備中</strong></div>
+        <div class="profile">
+          <div class="avatar">FS</div>
+          <div><strong>FlowShift</strong><small>Investor Workspace</small></div>
+          <span class="profile-more">···</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <button class="mobile-brand" type="button" aria-label="メニュー">
+          <span class="brand-mark small"><svg viewBox="0 0 32 32" fill="none"><path d="M5 22.5 12 15l5 4 10-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 8H27v6.5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <strong>FlowShift Investor</strong>
+        </button>
+        <div class="topbar-title"><span class="breadcrumb">Workspace</span><span class="breadcrumb-separator">/</span><strong>AI Analyst</strong></div>
+        <div class="topbar-actions">
+          <span class="model-label"><span class="status-dot"></span> Gemini Analyst</span>
+          <button class="icon-button" type="button" aria-label="設定">⚙</button>
+        </div>
+      </header>
+
+      <section class="chat-area">
+        <div class="conversation">
+          <div class="welcome-block">
+            <div class="eyebrow"><span class="eyebrow-line"></span> MARKET INTELLIGENCE</div>
+            <h1>市場の変化を、<span>対話</span>から読み解く。</h1>
+            <p class="welcome-description">ランキングの変化、資金の動きの仮説、投資方針の検証。<br class="desktop-break">データとあなたの視点をつなぐ分析パートナーです。</p>
+            <div class="data-status">
+              <span class="status-dot"></span>
+              <span>最新分析データ</span>
+              <strong>2026.11.09</strong>
+              <span class="status-divider"></span>
+              <span>比較期間</span>
+              <strong>11/05 → 11/09</strong>
+            </div>
+          </div>
+
+          <div class="assistant-intro">
+            <div class="assistant-avatar" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none"><path d="M5 22.5 12 15l5 4 10-11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 8H27v6.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="assistant-content">
+              <div class="assistant-name">FlowShift AI Analyst <span class="beta-tag">PREVIEW</span></div>
+              <p>こんにちは。最新のランキング分析データとFlowShiftの投資方針をもとに、一緒に市場を整理していきましょう。</p>
+              <p>銘柄単体だけでなく、テーマ全体の広がりや継続性、反対材料についても対話できます。</p>
+            </div>
+          </div>
+
+          <div class="suggestions">
+            <p class="section-label">EXPLORE THE MARKET</p>
+            <div class="suggestion-grid">
+              <button class="suggestion-card" type="button">
+                <span class="suggestion-icon green">↗</span>
+                <span><strong>INITIAL_FLOWを探す</strong><small>市場の関心が高まり始めた銘柄は？</small></span>
+                <span class="suggestion-arrow">↗</span>
+              </button>
+              <button class="suggestion-card" type="button">
+                <span class="suggestion-icon blue">⌁</span>
+                <span><strong>テーマの広がりを見る</strong><small>複数銘柄で動きが出ているテーマは？</small></span>
+                <span class="suggestion-arrow">↗</span>
+              </button>
+              <button class="suggestion-card" type="button">
+                <span class="suggestion-icon amber">◎</span>
+                <span><strong>継続性を検証する</strong><small>SUSTAINED_FLOWの候補を確認</small></span>
+                <span class="suggestion-arrow">↗</span>
+              </button>
+              <button class="suggestion-card" type="button">
+                <span class="suggestion-icon violet">⟳</span>
+                <span><strong>再加速の兆候を探す</strong><small>RE_ACCELERATIONの候補は？</small></span>
+                <span class="suggestion-arrow">↗</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="composer-wrap">
+            <form class="composer" action="#" method="get">
+              <textarea rows="1" aria-label="メッセージ" placeholder="市場や銘柄について質問する..."></textarea>
+              <div class="composer-footer">
+                <div class="composer-hints"><span class="hint-dot"></span> 分析データと投資方針を参照</div>
+                <div class="composer-tools">
+                  <span class="enter-hint">Enterで送信</span>
+                  <button class="send-button" type="submit" aria-label="送信" disabled>
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M6 11l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+              </div>
+            </form>
+            <p class="disclaimer">AIの分析は仮説の整理を支援するものです。投資判断を自動で行うものではありません。</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
