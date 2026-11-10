@@ -6,8 +6,10 @@
   const newChatButton = document.querySelector('.new-chat');
   const suggestions = document.querySelectorAll('.suggestion-card');
   let activeSpeechButton = null;
+  let speechToken = 0;
 
   const stopReading = () => {
+    speechToken++;
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     if (activeSpeechButton) {
       activeSpeechButton.textContent = '▶ 読み上げ';
@@ -16,7 +18,7 @@
     }
   };
 
-  const speakText = (text, button) => {
+  const speakText = (text, button, rateSelect) => {
     if (!('speechSynthesis' in window)) {
       button.textContent = '音声非対応';
       button.disabled = true;
@@ -27,19 +29,30 @@
       return;
     }
     stopReading();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ja-JP';
-    utterance.rate = 1;
+    const token = speechToken;
+    const rate = Number(rateSelect.value) || 1;
     const voices = window.speechSynthesis.getVoices();
     const japaneseVoice = voices.find(voice => voice.lang === 'ja-JP') ||
       voices.find(voice => voice.lang?.startsWith('ja'));
-    if (japaneseVoice) utterance.voice = japaneseVoice;
-    utterance.onend = stopReading;
-    utterance.onerror = stopReading;
+    // 長文を短い単位に分け、ブラウザの読み上げ停止を防ぐ
+    const chunks = text.match(/[\\s\\S]{1,160}(?:[。！？、\\n]|$)/g) || [text];
+    const speakChunk = (index) => {
+      if (token !== speechToken || index >= chunks.length) {
+        if (token === speechToken) stopReading();
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(chunks[index]);
+      utterance.lang = 'ja-JP';
+      utterance.rate = rate;
+      if (japaneseVoice) utterance.voice = japaneseVoice;
+      utterance.onend = () => speakChunk(index + 1);
+      utterance.onerror = () => { if (token === speechToken) stopReading(); };
+      window.speechSynthesis.speak(utterance);
+    };
     activeSpeechButton = button;
     button.textContent = '■ 停止';
     button.classList.add('speaking');
-    window.speechSynthesis.speak(utterance);
+    speakChunk(0);
   };
 
   if (!form || !textarea || !sendButton || !conversation) return;
@@ -76,8 +89,21 @@
       readButton.textContent = '🔊 読み上げ';
       readButton.setAttribute('aria-label', 'このAI回答を音声で読み上げる');
       readButton.style.cssText = 'display:inline-flex!important;align-items:center;gap:6px;margin-top:14px;padding:9px 14px;border:1px solid #b9d7c6;border-radius:8px;color:#315d4a;background:#f0f7f2;font-size:12px;font-weight:600;cursor:pointer;visibility:visible;opacity:1;';
-      readButton.addEventListener('click', () => speakText(text, readButton));
-      item.appendChild(readButton);
+      const controls = document.createElement('div');
+      controls.className = 'speech-controls';
+      const rateSelect = document.createElement('select');
+      rateSelect.className = 'speech-rate';
+      rateSelect.setAttribute('aria-label', '読み上げ速度');
+      [['0.8', 'ゆっくり'], ['1', '標準'], ['1.2', '少し速い'], ['1.5', '速い']].forEach(([value, caption]) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = caption;
+        if (value === '1') option.selected = true;
+        rateSelect.appendChild(option);
+      });
+      readButton.addEventListener('click', () => speakText(text, readButton, rateSelect));
+      controls.append(readButton, rateSelect);
+      item.appendChild(controls);
     }
 
     messageList.appendChild(item);
