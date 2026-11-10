@@ -55,6 +55,8 @@
         return;
       }
       const utterance = new SpeechSynthesisUtterance(chunks[index]);
+      // Android Chromeではvoiceを明示指定すると synthesis-failed になる場合があるため、
+      // OS側の日本語音声エンジンに選択を任せる。
       utterance.lang = 'ja-JP';
       utterance.rate = rate;
       utterance.onstart = () => {
