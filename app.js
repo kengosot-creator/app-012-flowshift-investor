@@ -8,9 +8,7 @@
   let activeSpeechButton = null;
   let speechToken = 0;
 
-  const stopReading = () => {
-    speechToken++;
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  const resetSpeechButton = () => {
     if (activeSpeechButton) {
       activeSpeechButton.textContent = '▶ 読み上げ';
       activeSpeechButton.classList.remove('speaking');
@@ -18,8 +16,14 @@
     }
   };
 
+  const stopReading = () => {
+    speechToken++;
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    resetSpeechButton();
+  };
+
   const speakText = (text, button, rateSelect) => {
-    if (!('speechSynthesis' in window)) {
+    if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
       button.textContent = '音声非対応';
       button.disabled = true;
       return;
@@ -28,39 +32,52 @@
       stopReading();
       return;
     }
-    // Android Chromeでは、再生開始直前のcancel()が新しい音声まで止める場合がある。
-    // 既に別の読み上げが動いている場合だけ停止する。
     if (activeSpeechButton) stopReading();
+
+    const synth = window.speechSynthesis;
     speechToken++;
     const token = speechToken;
     const rate = Number(rateSelect.value) || 1;
-    const voices = window.speechSynthesis.getVoices();
-    const japaneseVoice = voices.find(voice => voice.lang === 'ja-JP') ||
-      voices.find(voice => voice.lang?.startsWith('ja'));
-    // 長文を短い単位に分け、ブラウザの読み上げ停止を防ぐ
-    const chunks = text.match(/[\\s\\S]{1,160}(?:[。！？、\\n]|$)/g) || [text];
+    const status = button.parentElement?.querySelector('.speech-status');
+    const chunks = [];
+    for (let i = 0; i < text.length; i += 120) chunks.push(text.slice(i, i + 120));
+
+    const finish = () => {
+      if (token !== speechToken) return;
+      resetSpeechButton();
+      if (status) status.textContent = '読み上げが終了しました。';
+    };
+
     const speakChunk = (index) => {
-      if (token !== speechToken || index >= chunks.length) {
-        if (token === speechToken) stopReading();
+      if (token !== speechToken) return;
+      if (index >= chunks.length) {
+        finish();
         return;
       }
       const utterance = new SpeechSynthesisUtterance(chunks[index]);
       utterance.lang = 'ja-JP';
       utterance.rate = rate;
-      if (japaneseVoice) utterance.voice = japaneseVoice;
-      utterance.onend = () => speakChunk(index + 1);
+      utterance.onstart = () => {
+        if (token === speechToken && status) status.textContent = '読み上げ中…';
+      };
+      utterance.onend = () => {
+        if (token === speechToken) window.setTimeout(() => speakChunk(index + 1), 120);
+      };
       utterance.onerror = (event) => {
         if (token !== speechToken) return;
-        stopReading();
-        const status = button.parentElement?.querySelector('.speech-status');
-        if (status) status.textContent = '音声を再生できません。Androidのテキスト読み上げ設定を確認してください。';
-        console.warn('Speech synthesis error:', event.error);
+        resetSpeechButton();
+        if (status) status.textContent = '再生エラー: ' + (event.error || '原因を特定できません');
+        console.warn('Speech synthesis error:', event.error, event);
       };
-      window.speechSynthesis.speak(utterance);
+      synth.speak(utterance);
     };
+
     activeSpeechButton = button;
     button.textContent = '■ 停止';
     button.classList.add('speaking');
+    if (status) status.textContent = '音声を準備しています…';
+    // Android Chromeで一時停止状態が残るケースへの対策
+    synth.resume();
     speakChunk(0);
   };
 
